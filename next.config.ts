@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  distDir: process.env.NEXT_TEST_MODE === "true" ? ".next-e2e" : ".next",
 };
 
 export default nextConfig;

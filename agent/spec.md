@@ -46,17 +46,59 @@ A simplified eBay-style auction platform where users can create listings and pla
 ## Testing Strategy (Global)
 - Vitest:
   - Test pure domain services first (auction rules, bid rules, AI parsing/transforms).
-  - Test adapters (Prisma repositories, auth wrappers) with controlled fixtures/mocks.
+  - Test adapters (Prisma repositories, auth wrappers) with controlled fixtures/mocks where practical.
   - Test route handlers/server actions for input validation and authz branches.
+  - Run integration tests against `postgres-test` via `DATABASE_TEST_URL` by default.
 - Playwright:
   - Focus on core end-user journeys per phase.
   - Use stable seed data and deterministic clocks where auction timing matters.
   - Include negative-path coverage (invalid form, unauthorized actions).
+  - Use fixtures for test data/session/runtime context, not Docker lifecycle management.
+- Test database lifecycle:
+  - `postgres-test` is reset once per full e2e run and seeded with deterministic fixtures.
+  - Test DB storage is ephemeral by default.
 - CI target (future):
   - `npm run lint`
   - `npx tsc --noEmit`
   - `npm run test`
   - `npx playwright test`
+
+## Local Infrastructure Contracts (Phase 0 Baseline)
+- Docker Compose:
+  - One compose topology with two PostgreSQL services:
+    - `postgres-dev` (local development DB)
+    - `postgres-test` (integration/e2e DB)
+  - Fixed host ports:
+    - `postgres-dev`: `5432`
+    - `postgres-test`: `5433`
+- Environment variables:
+  - `DATABASE_URL` points to `postgres-dev`.
+  - `DATABASE_TEST_URL` points to `postgres-test`.
+- Script contracts:
+  - `dev:db:up` starts local dev DB dependencies.
+  - `test:db:up` starts local test DB dependencies.
+  - `test:db:down` stops local test DB dependencies.
+  - E2E entrypoint depends on test DB availability and reset/seed bootstrap.
+
+### Phase 0 Implementation Notes (2026-02-15)
+- `docker-compose.yml` defines `postgres-dev` (`5432`) and `postgres-test` (`5433`), with isolated storage.
+- Env contract is documented in `.env.example` and `.env.test.example`.
+- Prisma is configured with standard schema datasource URL (`env("DATABASE_URL")`) in `prisma/schema.prisma`.
+- Initial migration is checked in under `prisma/migrations/20260215000100_phase0_init/migration.sql`.
+- BetterAuth base setup is wired in `src/lib/auth/index.ts` with Next.js route handler under `src/app/api/auth/[...all]/route.ts`.
+- Vitest is split into unit and integration configs with centralized tests under `/tests`.
+- Integration test startup fails fast when `DATABASE_TEST_URL` is missing (`scripts/ensure-test-db-url.ts`).
+- Playwright global setup resets/seeds the test DB once per run and fixtures manage runtime context (`tests/e2e/fixtures.ts`).
+
+## Project Structure Conventions
+- Canonical test root: `/tests`
+- Required subfolders:
+  - `/tests/unit`
+  - `/tests/integration`
+  - `/tests/fixtures`
+  - `/tests/e2e`
+- Policy:
+  - Centralize tests under `/tests/*` rather than colocating tests in app source folders.
 
 ## Data Model (Initial Draft)
 - `User`: id, email, displayName, avatarUrl, createdAt, updatedAt
@@ -81,22 +123,38 @@ Establish baseline architecture, quality gates, and developer workflow.
 
 #### Scope
 - Configure Prisma + PostgreSQL and initial migrations.
+- Define Docker Compose-based local DB topology with `postgres-dev` and `postgres-test`.
+- Enforce fixed local port mapping (`5432` dev, `5433` test) and explicit env contracts.
 - Configure BetterAuth scaffolding.
 - Configure Vitest test runner and basic test utilities.
 - Configure Playwright with at least one smoke E2E.
+- Define hybrid orchestration where scripts manage DB lifecycle and Playwright fixtures manage test runtime context.
 - Add shared app structure for services, repositories, schemas, and UI components.
 
 #### Deliverables
+- Compose file and DB service definitions for local development and testing.
 - Working DB connection + migration workflow.
+- Documented env contract for `DATABASE_URL` and `DATABASE_TEST_URL`.
+- Documented DB lifecycle scripts (`dev:db:up`, `test:db:up`, `test:db:down`) and e2e bootstrap/reset flow.
+- Canonical `/tests` structure with `unit`, `integration`, `fixtures`, and `e2e`.
 - Auth and app boot without runtime errors.
 - Testing commands documented and executable.
 
 #### Acceptance Criteria
-- Lint, typecheck, Vitest smoke tests, Playwright smoke test pass.
+- Dev and test DB services are independently runnable and reachable.
+- Dev/test DB isolation is verified (no cross-environment data leakage).
+- Test DB reset-once-per-run workflow is documented and validated for e2e.
+- Lint, typecheck, Vitest smoke tests (including DB-backed integration smoke), and Playwright smoke test pass.
 
 #### Required Tests
-- Vitest: schema/util smoke tests.
-- Playwright: app shell loads, unauthenticated landing page rendering.
+- Vitest:
+  - schema/util smoke tests
+  - DB-backed integration smoke against `postgres-test`, including one minimal repository round-trip
+- Playwright:
+  - app shell loads and unauthenticated landing page rendering
+  - smoke run uses test DB orchestration with deterministic reset/seed bootstrap
+- Failure-path checks:
+  - missing `DATABASE_TEST_URL` fails fast with a clear test startup error
 
 ---
 

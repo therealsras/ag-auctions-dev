@@ -8,14 +8,27 @@ Status key:
 Last updated: 2026-02-15
 
 ## Phase 0: Foundation and Tooling
-- [ ] Define folder architecture for `src/server`, `src/features`, and shared schemas
-- [ ] Add Prisma + PostgreSQL configuration
-- [ ] Create initial Prisma schema + migration
-- [ ] Configure BetterAuth base setup
-- [ ] Configure Vitest and add smoke tests
-- [ ] Configure Playwright and add smoke E2E
-- [ ] Add test data/seed strategy for local and CI
-- [ ] Run acceptance gate (`lint`, `typecheck`, Vitest, Playwright)
+- [x] Define folder architecture for `src/server`, `src/features`, shared schemas, and centralized `/tests` layout
+- [x] Add Docker Compose topology with `postgres-dev` (`5432`) and `postgres-test` (`5433`)
+- [x] Document and wire env contract: `DATABASE_URL` (dev) and `DATABASE_TEST_URL` (test)
+- [x] Add DB lifecycle scripts: `dev:db:up`, `test:db:up`, `test:db:down`
+- [x] Add Prisma + PostgreSQL configuration
+- [x] Create initial Prisma schema + migration
+- [x] Configure BetterAuth base setup
+- [x] Configure Vitest and add smoke tests across `/tests/unit` and `/tests/integration`
+- [x] Add DB-backed integration smoke test against `postgres-test` with minimal repository round-trip
+- [x] Configure Playwright and add smoke E2E under `/tests/e2e`
+- [x] Add hybrid orchestration contract: scripts manage DB lifecycle; Playwright fixtures manage test data/session/runtime context
+- [x] Add test DB reset + deterministic seed bootstrap once per e2e run
+- [x] Add failure-path check for missing `DATABASE_TEST_URL` with clear startup/test error
+- [x] Verify dev/test DB isolation behavior (no cross-environment data leakage)
+- [x] Run acceptance gate (final)
+- [x] Acceptance check: DB services up verification (`npm run test:db:up`)
+- [x] Acceptance check: test DB reset verification (`npm run test:db:reset`)
+- [x] Acceptance check: `npm run lint`
+- [x] Acceptance check: `npm run typecheck`
+- [x] Acceptance check: Vitest (`npm run test:unit`, `npm run test:integration`)
+- [x] Acceptance check: Playwright (`npm run test:e2e`)
 
 ## Phase 1: Authentication and User Profile
 - [ ] Implement register/login/logout flows

@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Agentic Auctions
 
-## Getting Started
+Phase 0 baseline scaffolding for a Next.js + Prisma + PostgreSQL auction app.
 
-First, run the development server:
+## Code Structure
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- `src/lib/env.ts`: required environment variable helpers.
+- `src/lib/db/create-prisma-client.ts`: Prisma client factory.
+- `src/lib/db/prisma.ts`: shared Prisma singleton wiring.
+- `src/lib/auth/index.ts`: Better Auth server configuration.
+- `src/lib/schemas/*`: shared Zod schemas.
+- `src/lib/actions/*`: server-side mutation actions.
+- `src/lib/queries/*`: server-side read/query helpers.
+- `src/app/api/auth/[...all]/route.ts`: Next.js auth route handler.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copy `.env.example` to `.env` and set secrets.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Required variables:
+- `DATABASE_URL` for dev DB (`postgres-dev`)
+- `DATABASE_TEST_URL` for integration/e2e DB (`postgres-test`)
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL`
 
-## Learn More
+## Local Database Topology
 
-To learn more about Next.js, take a look at the following resources:
+Docker Compose defines:
+- `postgres-dev` on host port `5432`
+- `postgres-test` on host port `5433`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Commands:
+- `npm run dev:db:up`
+- `npm run test:db:up`
+- `npm run test:db:down`
+- `npm run test:db:reset`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## App Development
 
-## Deploy on Vercel
+- `npm run dev`
+- `npm run build`
+- `npm run start`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Validation and Tests
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run lint`
+- `npm run typecheck`
+- `npm run test:unit`
+- `npm run test:integration` (fails fast if `DATABASE_TEST_URL` is missing)
+- `npm run test:e2e`
+
+### Test Orchestration Contract
+
+- DB lifecycle (container start/stop) is managed by scripts.
+- Playwright fixtures manage runtime test context.
+- Test DB reset + deterministic seed happens once per Playwright run in global setup.
