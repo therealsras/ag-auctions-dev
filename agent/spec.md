@@ -4,7 +4,7 @@
 - Project: `agentic-auctions`
 - Tech stack: Next.js 16, TypeScript, Tailwind CSS, ShadCN, Prisma (PostgreSQL), BetterAuth, React Hook Form + Zod, Vercel AI SDK
 - Status: Living document (updated per phase before implementation)
-- Last updated: 2026-02-15
+- Last updated: 2026-02-16
 
 ## Product Scope
 A simplified eBay-style auction platform where users can create listings and place bids. The platform includes authentication, listing lifecycle management, bidding, search, dashboards, and AI-assisted listing/search/content workflows.
@@ -62,6 +62,13 @@ A simplified eBay-style auction platform where users can create listings and pla
   - `npx tsc --noEmit`
   - `npm run test`
   - `npx playwright test`
+
+## Implementation Workflow Gate
+- All implementation starts from a feature branch created from `main`.
+- Do not start phase implementation directly on `main`.
+- When a phase is marked complete by the user, stage all relevant files, commit with a clear message, and push the branch to GitHub.
+- Open a PR from that feature branch into `main`.
+- Merges to `main` should happen only through PRs with required CI checks passing.
 
 ## Local Infrastructure Contracts (Phase 0 Baseline)
 - Docker Compose:
@@ -160,24 +167,103 @@ Establish baseline architecture, quality gates, and developer workflow.
 
 ### Phase 1: Authentication and User Profile
 #### Objective
-Allow users to register, login, logout, and manage basic profile details.
+Deliver a usable authentication shell with navigable app routes, protected user areas, and an editable user profile.
 
 #### Scope
-- Register/login/logout flows with BetterAuth.
-- Profile page (view/edit display name, avatar URL placeholder).
-- Protected route patterns for authenticated areas.
+- Landing page at `/` with navbar, hero, primary CTA, and button links to `/login` and `/register`.
+- Theme direction:
+  - dark charcoal background + amber/gold primary
+  - colors defined in `src/app/globals.css` shadcn token variables
+  - components use tokenized classes (`bg-background`, `text-foreground`, `bg-primary`, etc.) with no hardcoded hex colors
+- Route placeholders to enable routing verification:
+  - public placeholders: `/dashboard`, `/listings`
+  - auth pages: `/login`, `/register`
+  - protected placeholders: `/profile`, `/sell`, `/watchlist`, `/my-listings`
+- Route transitions:
+  - add route-level transition wrapper (App Router template-based) with CSS/Tailwind fade-slide animation
+- Auth:
+  - BetterAuth email/password enabled
+  - auth client available for UI flows
+  - login/register success redirects to `/profile`
+  - sign out redirects to `/`
+- Navbar:
+  - signed-out: links to home/listings/dashboard/login/register
+  - signed-in: avatar dropdown with links:
+    - Sell my item (`/sell`)
+    - My watchlist (`/watchlist`)
+    - My listings (`/my-listings`)
+    - My profile (`/profile`)
+    - Sign out
+- Profile page:
+  - left side has large avatar placeholder, name, and bio
+  - placeholder sections for items listed by user and watched items
+  - editable profile form (name required, bio optional, image optional) using React Hook Form + Zod + shadcn form components
+- Middleware protection (Next.js 16):
+  - redirect unauthenticated users from protected routes to `/login`
+  - protected routes for Phase 1: `/sell`, `/watchlist`, `/my-listings`, `/profile`
 
-#### API/Domain Requirements
-- Session retrieval helper and route guard.
-- Profile update validation schema via Zod.
+#### Data Model / Prisma Requirements
+- Keep BetterAuth core models (`User`, `Session`, `Account`, `Verification`).
+- Add `Profile` model (1:1 with `User`) with:
+  - `id`
+  - `userId` unique FK
+  - `name` required
+  - `bio` optional
+  - `image` optional
+  - `createdAt`
+  - `updatedAt`
+- Registration flow must create an associated profile row.
+- Profile update flow updates the profile record (and may sync user display fields if required by navbar display logic).
+
+#### Seed Data Requirements
+- Seed exactly 3 auth-capable users with password `Pa$$w0rd`:
+  - Bob Bobbity, `bob@test.com`, `https://randomuser.me/api/portraits/men/1.jpg`
+  - Sally McSnortles, `sally@test.com`, `https://randomuser.me/api/portraits/women/11.jpg`
+  - Sir Bids-a-Lot, `sirbidsalot@test.com`, `https://randomuser.me/api/portraits/men/22.jpg`
+- Each seeded user must have a matching profile row.
+- Seed method must produce valid BetterAuth password records so seeded accounts can log in without manual registration.
+
+#### Public Interfaces / Contracts
+- Routes:
+  - `/`, `/login`, `/register`, `/dashboard`, `/listings`, `/profile`, `/sell`, `/watchlist`, `/my-listings`
+- Auth helpers:
+  - session retrieval utility for server components/middleware checks
+  - client auth utility for login/register/logout actions
+- Validation schemas:
+  - `loginSchema`
+  - `registerSchema`
+  - `profileUpdateSchema`
 
 #### Acceptance Criteria
-- Users can authenticate and persist sessions.
-- Unauthorized users cannot access protected routes.
+- Unauthenticated users can view landing page and public placeholders.
+- Unauthenticated access to protected routes redirects to `/login`.
+- Users can register, are authenticated, and land on `/profile`.
+- Users can log in with seeded credentials and land on `/profile`.
+- Signed-in navbar shows avatar dropdown with required links.
+- Sign out returns user to `/`.
+- Theme tokens drive colors across new UI surfaces.
+- Route transitions are visible between major page navigations.
 
 #### Required Tests
-- Vitest: auth guards, profile input validation, profile update service.
-- Playwright: register, login, logout, edit profile happy path + invalid input path.
+- Vitest:
+  - schema validation tests (`loginSchema`, `registerSchema`, `profileUpdateSchema`)
+  - middleware/guard behavior tests
+  - profile persistence/service tests
+  - seed script sanity assertions (3 users + profiles)
+- Playwright:
+  - landing page/navbar rendering and route navigation
+  - register flow redirect to profile
+  - login flow with seeded user redirect to profile
+  - protected route redirect when signed out
+  - signed-in dropdown link navigation
+  - sign-out redirect to home
+  - profile edit validation and save behavior
+
+#### Assumptions and Defaults
+- `/dashboard` and `/listings` are public placeholders in Phase 1.
+- Protected route scope is limited to `/sell`, `/watchlist`, `/my-listings`, and `/profile`.
+- Route transitions use CSS/Tailwind only (no animation dependency additions).
+- Comical seed users, emails, and images are exactly the values listed above.
 
 ---
 

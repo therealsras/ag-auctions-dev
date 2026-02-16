@@ -24,6 +24,14 @@ Keep releases simple while still preventing obvious breakages.
 6. Merge PR to `main`.
 7. Vercel auto-deploys from `main`.
 
+## Implementation Checklist (Per Phase)
+
+1. Create and switch to a feature branch before writing implementation code.
+2. Complete implementation and validation for the phase.
+3. Wait for explicit user approval that the phase is complete.
+4. Stage all relevant files, commit, and push branch to GitHub.
+5. Open PR to `main` and wait for required CI checks to pass before merge.
+
 ## CI Expectations
 
 At minimum, PR CI should run:

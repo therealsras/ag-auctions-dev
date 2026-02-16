@@ -5,7 +5,7 @@ Status key:
 - [x] Completed
 - [-] Deferred/blocked
 
-Last updated: 2026-02-15
+Last updated: 2026-02-16
 
 ## Phase 0: Foundation and Tooling
 - [x] Define folder architecture for `src/server`, `src/features`, shared schemas, and centralized `/tests` layout
@@ -31,13 +31,26 @@ Last updated: 2026-02-15
 - [x] Acceptance check: Playwright (`npm run test:e2e`)
 
 ## Phase 1: Authentication and User Profile
-- [ ] Implement register/login/logout flows
-- [ ] Add protected route utility
-- [ ] Build profile page and edit flow
-- [ ] Add Zod schema for profile updates
-- [ ] Add unit/integration tests
-- [ ] Add Playwright auth and profile E2E tests
-- [ ] Run phase acceptance gate
+- [x] Create feature branch from `main` for Phase 1 work
+- [x] Define Phase 1 route map and placeholder pages
+- [x] Build global navbar (signed-out state)
+- [x] Build landing page hero/CTA with login/register links
+- [x] Apply charcoal + amber/gold shadcn token theme in `globals.css`
+- [x] Add route transition template + CSS animation
+- [x] Add BetterAuth email/password config validation and env wiring
+- [x] Add Prisma `Profile` model and migration
+- [x] Implement register flow (RHF + Zod + shadcn), create user + profile, redirect to `/profile`
+- [x] Implement login flow (RHF + Zod + shadcn), redirect to `/profile`
+- [x] Implement auth-aware navbar signed-in state
+- [x] Implement avatar dropdown menu and placeholder destinations
+- [x] Implement profile page layout + edit form + placeholder sections
+- [x] Add Next.js middleware protection for `/sell`, `/watchlist`, `/my-listings`, `/profile`
+- [x] Implement sign out redirect to `/`
+- [x] Update seed script to create 3 auth-capable test users + profiles
+- [x] Update/add unit/integration tests for auth/profile/middleware/schemas
+- [ ] Add Playwright Phase 1 flows (auth, redirects, navbar dropdown, profile edit)
+- [x] Update existing smoke tests for new landing content
+- [x] Run Phase 1 acceptance gate (`lint`, `typecheck`, relevant tests, optional build)
 
 ## Phase 2: Listing Creation
 - [ ] Design listing and listing photo domain interfaces

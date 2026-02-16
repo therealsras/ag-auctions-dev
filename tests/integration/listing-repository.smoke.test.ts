@@ -36,4 +36,23 @@ describe("listing repository integration smoke", () => {
     expect(found).not.toBeNull();
     expect(found?.title).toBe("Integration Listing");
   });
+
+  it("returns null when listing does not exist", async () => {
+    const found = await getListingById("listing-does-not-exist");
+
+    expect(found).toBeNull();
+  });
+
+  it("rejects listing creation for an unknown seller", async () => {
+    await expect(
+      createListing({
+        sellerId: "user-does-not-exist",
+        title: "Invalid Seller Listing",
+        description: "Should fail FK constraint",
+        startingBid: 1000,
+        currentBid: 1000,
+        endAt: new Date(Date.now() + 3_600_000),
+      }),
+    ).rejects.toThrow();
+  });
 });
