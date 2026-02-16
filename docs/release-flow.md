@@ -23,6 +23,7 @@ Keep releases simple while still preventing obvious breakages.
 5. Ensure CI passes on the PR.
 6. Merge PR to `main`.
 7. Vercel auto-deploys from `main`.
+8. GitHub Action `DB Deploy` runs `prisma migrate deploy` on `main` to keep schema in sync.
 
 ## Implementation Checklist (Per Phase)
 
@@ -44,6 +45,16 @@ At minimum, PR CI should run:
 Optional for later:
 
 - Add `npm run build` in CI if you want an explicit build gate before merge.
+
+## Production DB Migrations
+
+- Workflow: `.github/workflows/db-deploy.yml`
+- Trigger:
+  - Automatic on push to `main` (migrations only)
+  - Manual via workflow dispatch with `run_seed=true` (migrations + seed)
+- Required GitHub Secrets:
+  - `DATABASE_URL`
+  - `BETTER_AUTH_SECRET` (manual seed path only)
 
 ## Vercel Setup
 
