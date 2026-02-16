@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Bodoni_Moda, Plus_Jakarta_Sans } from "next/font/google";
+import { Navbar } from "@/components/app/navbar";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bodySans = Plus_Jakarta_Sans({
+  variable: "--font-body-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const displaySerif = Bodoni_Moda({
+  variable: "--font-display-serif",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: "Agentic Auctions",
-  description: "Auction platform scaffold",
+  description: "Auction marketplace for enthusiast sellers and bidders.",
 };
 
 export default function RootLayout({
@@ -24,8 +25,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+      <body className={`${bodySans.variable} ${displaySerif.variable} h-screen overflow-hidden antialiased`}>
+        <div className="flex h-full flex-col">
+          <Navbar />
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto w-full max-w-6xl px-6 py-10">{children}</div>
+          </div>
+        </div>
       </body>
     </html>
   );

@@ -9,7 +9,7 @@ How to use:
 - Mark completed items with `[x]`.
 - Keep concise and actionable.
 
-Last updated: 2026-02-15
+Last updated: 2026-02-16
 
 ## Backlog (Unassigned)
 - [ ]
@@ -25,8 +25,16 @@ Last updated: 2026-02-15
 - [x] check the repo for any files/folders that are not in use and can be removed. 
 
 ## Phase 1 Notes
-- [ ]
-
+- [x] Seed users.  update to the following user + 2 more with comical names:
+name: Bob Bobbity
+email: bob@test.com
+password: Pa$$w0rd
+image: https://randomuser.me/api/portraits/men/1.jpg
+- [x] Login + register both failing.  Authclient is getting the baseurl from env.ts when it should be using the BETTER_AUTH_URL defined in the .env file.  This setting is convention based so does not need to be in the auth-client and causes CORS error due to using 127.0.0.1.  Remove the baseUrl helpers in the env.ts file and rely on .env for variables.  
+- [x] Middleware.  next16 uses proxy.ts instead.  functionality remains the same but update to incorportate new naming.
+- [x] Middleware.  Instead of using helper cookie methods use betterauth functionality to get the session.  Remove cookies helper.  
+- [x] Tailwind button styling.  Tailwind4 uses cursor-default, can you update the globals.css so buttons & use cursor-pointer.  
+- [x] User menu dropdown - should use cursor-pointer for the items.
 ## Phase 2 Notes
 - [ ]
 

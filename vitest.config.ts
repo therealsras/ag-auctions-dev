@@ -16,6 +16,10 @@ export default defineConfig({
   test: {
     coverage: {
       provider: "v8",
+      exclude: [
+        "src/generated/**",
+        "tests/**",
+      ],
     },
     projects: [
       {

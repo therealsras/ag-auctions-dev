@@ -1,16 +1,19 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@/lib/db/prisma";
+import { getRequiredEnv } from "@/lib/env";
 
-const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
+const trustedOrigin = process.env.BETTER_AUTH_URL?.trim();
 
 export const auth = betterAuth({
-  baseURL: BETTER_AUTH_URL,
+  secret: getRequiredEnv("BETTER_AUTH_SECRET"),
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  trustedOrigins: [BETTER_AUTH_URL],
+  ...(trustedOrigin ? { trustedOrigins: [trustedOrigin] } : {}),
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
   },
 });

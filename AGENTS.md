@@ -45,6 +45,13 @@
 - Do not revert unrelated local changes.
 - Document assumptions and any follow-up work needed.
 
+## Git Workflow (Required)
+- Before implementing any feature/phase work, create and switch to a feature branch from `main`.
+- Use branch names like `feature/<short-description>` (or another clear non-`main` branch name if needed).
+- Do not implement directly on `main`.
+- After the user explicitly confirms a phase is complete, stage all relevant changes, commit, and push the branch to GitHub.
+- After push, open a PR from the feature branch into `main` so CI can run and gate merge.
+
 ## Notes for Future Agents
 - This repository currently appears to be in an early scaffold phase.
 - If adding architecture (state, API, DB, auth), record decisions in `README.md` or a dedicated `docs/` file.
