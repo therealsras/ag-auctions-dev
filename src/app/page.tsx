@@ -6,7 +6,7 @@ export default function Home() {
         Phase 0 foundation is configured.
       </p>
       <p className="mt-2 max-w-2xl text-sm text-zinc-500">
-        CI smoke update: landing page revision 1.
+        CI smoke update: landing page revision 2.
       </p>
     </main>
   );
