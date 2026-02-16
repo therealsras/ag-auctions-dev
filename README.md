@@ -23,6 +23,22 @@ Required variables:
 - `BETTER_AUTH_SECRET`
 - `BETTER_AUTH_URL`
 
+## Production Database Deploy
+
+Prisma migrations are applied in GitHub Actions via `.github/workflows/db-deploy.yml`.
+
+Required GitHub repository secrets:
+- `DATABASE_URL`: production database connection string
+- `BETTER_AUTH_SECRET`: required only when running seed
+
+Commands:
+- `npm run prisma:migrate:deploy` to apply migrations
+- `npm run prisma:seed` to seed data
+
+Notes:
+- Push to `main` runs migrations automatically.
+- Seeding is manual via workflow dispatch input `run_seed=true`.
+
 ## Local Database Topology
 
 Docker Compose defines:

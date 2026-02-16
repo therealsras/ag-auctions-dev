@@ -17,7 +17,9 @@
     "test": "npm run test:unit && npm run test:integration",
     "test:unit": "vitest run --project unit",
     "test:integration": "tsx scripts/ensure-test-db-url.ts && npm run test:db:reset && vitest run --project integration",
-    "test:e2e": "npm run test:db:up && playwright test"
+    "test:e2e": "npm run test:db:up && playwright test",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:seed": "prisma db seed"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
