@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_TEST_URL: postgresql://postgres:postgres@localhost:5432/agentic_auctions_test?schema=public
+      BETTER_AUTH_SECRET: ci-test-secret-not-for-production
 
     services:
       postgres:
